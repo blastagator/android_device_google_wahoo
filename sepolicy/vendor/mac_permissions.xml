@@ -24,9 +24,6 @@
     <signer signature="@GOOGLE" >
       <seinfo value="google" />
     </signer>
-    <signer signature="@GOOGLEPULSE" >
-      <seinfo value="googlepulse" />
-    </signer>
     <signer signature="@TANGO" >
       <seinfo value="tango" />
     </signer>

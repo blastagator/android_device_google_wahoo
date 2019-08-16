@@ -14,10 +14,14 @@ finish()
 	umount /s
 	rmdir /v
 	rmdir /s
+	#mount /v /vendor
+	#mount /s/system /system
 	setprop crypto.ready 1
 	exit 0
 }
 
+rm -rf /odm
+mv /odmrename /odm
 suffix=$(getprop ro.boot.slot_suffix)
 if [ -z "$suffix" ]; then
 	suf=$(getprop ro.boot.slot)
@@ -29,6 +33,9 @@ mount -t ext4 -o ro "$venpath" /v
 syspath="/dev/block/bootdevice/by-name/system$suffix"
 mkdir /s
 mount -t ext4 -o ro "$syspath" /s
+rm -f /system
+mkdir -p /system/etc/vintf
+cp /manifest.xml /system/etc/vintf/manifest.xml
 
 # Pixel 2 walleye modules
 insmod /v/lib/modules/synaptics_dsx_core_htc.ko

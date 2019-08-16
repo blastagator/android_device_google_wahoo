@@ -5,7 +5,6 @@ on fs
     chown system drmrpc /dev/qseecom
     chmod 0664 /dev/ion
     chown system system /dev/ion
-    start pulldecryptfiles
     install_keyring
 
 service hwservicemanager /sbin/hwservicemanager
@@ -57,7 +56,8 @@ service esed /sbin/esed
 #    restorecon /data/vendor/ese
 #    start ese_load
 
-service ese_load /sbin/ese_load force
+# this must be named vendor.ese_load or esed won't start
+service vendor.ese_load /sbin/ese_load force
     disabled
     oneshot
     user root
@@ -80,34 +80,6 @@ service keystore /sbin/keystore /tmp/misc/keystore
     writepid /dev/cpuset/foreground/tasks
 
 on init
-    setprop ro.hardware.keystore msm8998
-    setprop ro.hardware.gatekeeper msm8998
-    setprop ro.hardware.bootctrl msm8998
-    start prepdecrypt
-    #setprop crypto.ready 1
-
-on property:crypto.ready=1
-    #start prepdecrypt
-    start hwservicemanager
-    start keymaster-3-0
-    start gatekeeper-1-0
-    start sbinqseecomd
-    start ese_load
-    start esed
-    start servicemanager
-    #start keystore
-
-on property:crypto.ready=0
-    stop sbinqseecomd
-    stop keymaster-3-0
-    stop gatekeeper-1-0
-    stop hwservicemanager
-    stop esed
-    stop keystore
-    stop servicemanager
-
-# defaults from recovery
-on init
     mount configfs none /config
     mkdir /config/usb_gadget/g1 0770 shell shell
     write /config/usb_gadget/g1/idVendor 0x18d1
@@ -119,6 +91,31 @@ on init
     mkdir /config/usb_gadget/g1/functions/ffs.adb
     write /config/usb_gadget/g1/os_desc/use 1
     setprop sys.usb.configfs 1
+    setprop ro.hardware.keystore msm8998
+    setprop ro.hardware.gatekeeper msm8998
+    setprop ro.hardware.bootctrl msm8998
+    start prepdecrypt
+    #setprop crypto.ready 1
+
+on property:crypto.ready=1
+    #start prepdecrypt
+    start servicemanager
+    start hwservicemanager
+    start sbinqseecomd
+    start keymaster-3-0
+    start gatekeeper-1-0
+    start vendor.ese_load
+    start esed
+    #start keystore
+
+on property:crypto.ready=0
+    stop sbinqseecomd
+    stop keymaster-3-0
+    stop gatekeeper-1-0
+    stop hwservicemanager
+    stop esed
+    stop keystore
+    stop servicemanager
 
 on property:sys.usb.ffs.ready=1
     mkdir /config/usb_gadget/g1/configs/b.1 0777 shell shell

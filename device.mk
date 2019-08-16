@@ -36,7 +36,7 @@ PRODUCT_COPY_FILES += \
 
 # Set the SVN for the targeted MR release
 PRODUCT_PROPERTY_OVERRIDES += \
-    ro.vendor.build.svn=27
+    ro.vendor.build.svn=17
 
 # Enforce privapp-permissions whitelist
 PRODUCT_PROPERTY_OVERRIDES += \
@@ -53,6 +53,9 @@ SRC_CAMERA_HAL_DIR := hardware/qcom/camera/msm8998
 
 TARGET_SYSTEM_PROP := $(LOCAL_PATH)/system.prop
 
+# Get kernel-headers
+$(call inherit-product, hardware/qcom/msm8998/msm8998.mk)
+
 $(call inherit-product, device/google/wahoo/utils.mk)
 
 ifeq ($(TARGET_PREBUILT_KERNEL),)
@@ -67,6 +70,7 @@ PRODUCT_SHIPPING_API_LEVEL := 26
 DEVICE_PACKAGE_OVERLAYS += $(LOCAL_PATH)/overlay
 
 PRODUCT_COPY_FILES += \
+    $(LOCAL_KERNEL):kernel \
     $(LOCAL_PATH)/init.recovery.hardware.rc:recovery/root/init.recovery.$(PRODUCT_HARDWARE).rc \
     $(LOCAL_PATH)/init.hardware.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/hw/init.$(PRODUCT_HARDWARE).rc \
     $(LOCAL_PATH)/init.hardware.usb.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/hw/init.wahoo.usb.rc \
@@ -87,8 +91,6 @@ PRODUCT_COPY_FILES += \
 ifneq (,$(filter userdebug eng, $(TARGET_BUILD_VARIANT)))
   PRODUCT_COPY_FILES += \
       $(LOCAL_PATH)/init.hardware.diag.rc.userdebug:$(TARGET_COPY_OUT_VENDOR)/etc/init/init.$(PRODUCT_HARDWARE).diag.rc
-  PRODUCT_COPY_FILES += \
-      $(LOCAL_PATH)/init.hardware.chamber.rc.userdebug:$(TARGET_COPY_OUT_VENDOR)/etc/init/init.$(PRODUCT_HARDWARE).chamber.rc
 else
   PRODUCT_COPY_FILES += \
       $(LOCAL_PATH)/init.hardware.diag.rc.user:$(TARGET_COPY_OUT_VENDOR)/etc/init/init.$(PRODUCT_HARDWARE).diag.rc
@@ -308,8 +310,8 @@ PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/wifi_concurrency_cfg.txt:$(TARGET_COPY_OUT_VENDOR)/etc/wifi/wifi_concurrency_cfg.txt
 
 #ipacm configuration files
-#PRODUCT_COPY_FILES += \
-#    hardware/qcom/data/ipacfg-mgr/msm8998/ipacm/src/IPACM_cfg.xml:$(TARGET_COPY_OUT_VENDOR)/etc/IPACM_cfg.xml
+PRODUCT_COPY_FILES += \
+    hardware/qcom/data/ipacfg-mgr/msm8998/ipacm/src/IPACM_cfg.xml:$(TARGET_COPY_OUT_VENDOR)/etc/IPACM_cfg.xml
 
 PRODUCT_PACKAGES += \
     hwcomposer.msm8998 \
@@ -573,7 +575,7 @@ PRODUCT_COPY_FILES += \
 PRODUCT_COPY_FILES += \
     frameworks/native/data/etc/android.software.device_id_attestation.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.software.device_id_attestation.xml
 
-ifneq (,$(filter eng, $(TARGET_BUILD_VARIANT)))
+ifneq (,$(filter userdebug eng, $(TARGET_BUILD_VARIANT)))
 # Subsystem ramdump
 PRODUCT_PROPERTY_OVERRIDES += \
     persist.sys.ssr.enable_ramdumps=1
@@ -682,6 +684,7 @@ PRODUCT_COPY_FILES += \
     device/google/wahoo/recovery/root/sbin/prepdecrypt.sh:recovery/root/sbin/prepdecrypt.sh \
 
 PRODUCT_COPY_FILES += \
+    device/google/wahoo/recovery/root/etc/twrp.fstab:recovery/root/etc/twrp.fstab \
     device/google/wahoo/recovery/root/sbin/qseecomd:recovery/root/sbin/qseecomd \
     device/google/wahoo/recovery/root/sbin/libdiag.so:recovery/root/sbin/libdiag.so \
     device/google/wahoo/recovery/root/sbin/libdrmfs.so:recovery/root/sbin/libdrmfs.so \
@@ -693,18 +696,24 @@ PRODUCT_COPY_FILES += \
     device/google/wahoo/recovery/root/sbin/libgptutils.so:recovery/root/sbin/libgptutils.so \
     device/google/wahoo/recovery/root/sbin/libkeymasterdeviceutils.so:recovery/root/sbin/libkeymasterdeviceutils.so \
     device/google/wahoo/recovery/root/nonplat_hwservice_contexts:recovery/root/nonplat_hwservice_contexts \
-    device/google/wahoo/recovery/root/nonplat_hwservice_contexts:recovery/root/nonplat_service_contexts \
     device/google/wahoo/recovery/root/plat_hwservice_contexts:recovery/root/plat_hwservice_contexts \
     device/google/wahoo/recovery/root/plat_hwservice_contexts:recovery/root/plat_service_contexts \
-    device/google/wahoo/recovery/root/vendor/manifest.xml:recovery/root/vendor/manifest.xml \
-    device/google/wahoo/recovery/root/vendor/compatibility_matrix.xml:recovery/root/vendor/compatibility_matrix.xml \
-    device/google/wahoo/recovery/root/odm/lib64/hw/android.hardware.boot@1.0-impl.so:recovery/root/odm/lib64/hw/android.hardware.boot@1.0-impl.so \
-    device/google/wahoo/recovery/root/odm/lib64/hw/android.hardware.gatekeeper@1.0-impl-qti.so:recovery/root/odm/lib64/hw/android.hardware.gatekeeper@1.0-impl-qti.so \
-    device/google/wahoo/recovery/root/odm/lib64/hw/android.hardware.keymaster@3.0-impl-qti.so:recovery/root/odm/lib64/hw/android.hardware.keymaster@3.0-impl-qti.so \
+    device/google/wahoo/recovery/root/vendor/compatibility_matrix.1.xml:recovery/root/vendor/compatibility_matrix.1.xml \
+    device/google/wahoo/recovery/root/vendor/compatibility_matrix.2.xml:recovery/root/vendor/compatibility_matrix.2.xml \
+    device/google/wahoo/recovery/root/vendor/compatibility_matrix.3.xml:recovery/root/vendor/compatibility_matrix.3.xml \
+    device/google/wahoo/recovery/root/vendor/compatibility_matrix.device.xml:recovery/root/vendor/compatibility_matrix.device.xml \
+    device/google/wahoo/recovery/root/vendor/compatibility_matrix.legacy.xml:recovery/root/vendor/compatibility_matrix.legacy.xml \
+    device/google/wahoo/recovery/root/vendor/etc/vintf/manifest.xml:recovery/root/vendor/etc/vintf/manifest.xml \
+    device/google/wahoo/recovery/root/odm/etc/vintf/manifest.xml:recovery/root/odmrename/etc/vintf/manifest.xml \
+    device/google/wahoo/recovery/root/system/etc/vintf/manifest.xml:recovery/root/manifest.xml \
+    device/google/wahoo/recovery/root/vendor/etc/vintf/compatibility_matrix.xml:recovery/root/vendor/etc/vintf/compatibility_matrix.xml \
+    device/google/wahoo/recovery/root/odm/lib64/hw/android.hardware.boot@1.0-impl.so:recovery/root/odmrename/lib64/hw/android.hardware.boot@1.0-impl.so \
+    device/google/wahoo/recovery/root/odm/lib64/hw/android.hardware.gatekeeper@1.0-impl-qti.so:recovery/root/odmrename/lib64/hw/android.hardware.gatekeeper@1.0-impl-qti.so \
+    device/google/wahoo/recovery/root/odm/lib64/hw/android.hardware.keymaster@3.0-impl-qti.so:recovery/root/odmrename/lib64/hw/android.hardware.keymaster@3.0-impl-qti.so \
     device/google/wahoo/recovery/root/sbin/android.hardware.keymaster@3.0-service-qti:recovery/root/sbin/android.hardware.keymaster@3.0-service-qti \
     device/google/wahoo/recovery/root/sbin/android.hardware.gatekeeper@1.0-service-qti:recovery/root/sbin/android.hardware.gatekeeper@1.0-service-qti \
     device/google/wahoo/recovery/root/sbin/android.hardware.boot@1.0-service:recovery/root/sbin/android.hardware.boot@1.0-service \
-    device/google/wahoo/recovery/root/odm/lib64/hw/bootctrl.msm8998.so:recovery/root/odm/lib64/hw/bootctrl.msm8998.so \
+    device/google/wahoo/recovery/root/odm/lib64/hw/bootctrl.msm8998.so:recovery/root/odmrename/lib64/hw/bootctrl.msm8998.so \
     device/google/wahoo/recovery/root/sbin/esed:recovery/root/sbin/esed \
     device/google/wahoo/recovery/root/sbin/ese-ls-provision:recovery/root/sbin/ese-ls-provision \
     device/google/wahoo/recovery/root/sbin/android.hardware.weaver@1.0.so:recovery/root/sbin/android.hardware.weaver@1.0.so \
@@ -716,13 +725,13 @@ PRODUCT_COPY_FILES += \
     device/google/wahoo/recovery/root/sbin/libese.so:recovery/root/sbin/libese.so \
     device/google/wahoo/recovery/root/sbin/libese-sysdeps.so:recovery/root/sbin/libese-sysdeps.so \
     device/google/wahoo/recovery/root/sbin/libese-teq1.so:recovery/root/sbin/libese-teq1.so \
-    device/google/wahoo/recovery/root/odm/firmware/ese/prodkeys/ese.f000.prodkeys:recovery/root/odm/firmware/ese/prodkeys/ese.f000.prodkeys \
-    device/google/wahoo/recovery/root/odm/firmware/ese/prodkeys/ese.f102.prodkeys:recovery/root/odm/firmware/ese/prodkeys/ese.f102.prodkeys \
-    device/google/wahoo/recovery/root/odm/firmware/ese/prodkeys/ese.f200.prodkeys:recovery/root/odm/firmware/ese/prodkeys/ese.f200.prodkeys \
-    device/google/wahoo/recovery/root/odm/firmware/ese/prodkeys/ese.f201.prodkeys:recovery/root/odm/firmware/ese/prodkeys/ese.f201.prodkeys \
-    device/google/wahoo/recovery/root/odm/firmware/ese/prodkeys/ese.shadata.prodkeys:recovery/root/odm/firmware/ese/prodkeys/ese.shadata.prodkeys \
-    device/google/wahoo/recovery/root/odm/firmware/ese/testkeys/ese.f000.testkeys:recovery/root/odm/firmware/ese/testkeys/ese.f000.testkeys \
-    device/google/wahoo/recovery/root/odm/firmware/ese/testkeys/ese.f102.testkeys:recovery/root/odm/firmware/ese/testkeys/ese.f102.testkeys \
-    device/google/wahoo/recovery/root/odm/firmware/ese/testkeys/ese.f200.testkeys:recovery/root/odm/firmware/ese/testkeys/ese.f200.testkeys \
-    device/google/wahoo/recovery/root/odm/firmware/ese/testkeys/ese.f201.testkeys:recovery/root/odm/firmware/ese/testkeys/ese.f201.testkeys \
-    device/google/wahoo/recovery/root/odm/firmware/ese/testkeys/ese.shadata.testkeys:recovery/root/odm/firmware/ese/testkeys/ese.shadata.testkeys
+    device/google/wahoo/recovery/root/odm/firmware/ese/prodkeys/ese.f000.prodkeys:recovery/root/odmrename/firmware/ese/prodkeys/ese.f000.prodkeys \
+    device/google/wahoo/recovery/root/odm/firmware/ese/prodkeys/ese.f102.prodkeys:recovery/root/odmrename/firmware/ese/prodkeys/ese.f102.prodkeys \
+    device/google/wahoo/recovery/root/odm/firmware/ese/prodkeys/ese.f200.prodkeys:recovery/root/odmrename/firmware/ese/prodkeys/ese.f200.prodkeys \
+    device/google/wahoo/recovery/root/odm/firmware/ese/prodkeys/ese.f201.prodkeys:recovery/root/odmrename/firmware/ese/prodkeys/ese.f201.prodkeys \
+    device/google/wahoo/recovery/root/odm/firmware/ese/prodkeys/ese.shadata.prodkeys:recovery/root/odmrename/firmware/ese/prodkeys/ese.shadata.prodkeys \
+    device/google/wahoo/recovery/root/odm/firmware/ese/testkeys/ese.f000.testkeys:recovery/root/odmrename/firmware/ese/testkeys/ese.f000.testkeys \
+    device/google/wahoo/recovery/root/odm/firmware/ese/testkeys/ese.f102.testkeys:recovery/root/odmrename/firmware/ese/testkeys/ese.f102.testkeys \
+    device/google/wahoo/recovery/root/odm/firmware/ese/testkeys/ese.f200.testkeys:recovery/root/odmrename/firmware/ese/testkeys/ese.f200.testkeys \
+    device/google/wahoo/recovery/root/odm/firmware/ese/testkeys/ese.f201.testkeys:recovery/root/odmrename/firmware/ese/testkeys/ese.f201.testkeys \
+    device/google/wahoo/recovery/root/odm/firmware/ese/testkeys/ese.shadata.testkeys:recovery/root/odmrename/firmware/ese/testkeys/ese.shadata.testkeys

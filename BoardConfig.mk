@@ -14,9 +14,6 @@
 # limitations under the License.
 #
 
-# Allow Lineage config to override others
--include device/google/wahoo/BoardConfigLineage.mk
-
 TARGET_BOARD_PLATFORM := msm8998
 
 TARGET_ARCH := arm64
@@ -40,7 +37,7 @@ BOARD_KERNEL_CMDLINE += loop.max_part=7
 BOARD_KERNEL_CMDLINE += raid=noautodetect
 BOARD_KERNEL_CMDLINE += usbcore.autosuspend=7
 # For the love of all that is holy, please do not include this in your ROM unless you really want TWRP to not work correctly!
-BOARD_KERNEL_CMDLINE += androidboot.fastboot=1 
+BOARD_KERNEL_CMDLINE += androidboot.fastboot=1
 
 BOARD_KERNEL_BASE        := 0x00000000
 BOARD_KERNEL_PAGESIZE    := 4096
@@ -50,8 +47,8 @@ BOARD_KERNEL_TAGS_OFFSET := 0x02500000
 BOARD_RAMDISK_OFFSET     := 0x02700000
 BOARD_MKBOOTIMG_ARGS     := --kernel_offset $(BOARD_KERNEL_OFFSET) --ramdisk_offset $(BOARD_RAMDISK_OFFSET) --tags_offset $(BOARD_KERNEL_TAGS_OFFSET)
 else
-BOARD_KERNEL_TAGS_OFFSET := 0x01E00000
-BOARD_RAMDISK_OFFSET     := 0x02000000
+BOARD_KERNEL_TAGS_OFFSET := 0x02500000
+BOARD_RAMDISK_OFFSET     := 0x02700000
 endif
 
 TARGET_NO_BOOTLOADER ?= true
@@ -65,7 +62,6 @@ TARGET_RECOVERY_WIPE := device/google/wahoo/recovery.wipe
 TARGET_RECOVERY_FSTAB := device/google/wahoo/fstab.hardware
 
 BOARD_AVB_ENABLE := true
-BOARD_AVB_MAKE_VBMETA_IMAGE_ARGS += --flag 2
 
 BOARD_SYSTEMIMAGE_PARTITION_SIZE := 2684354560
 BOARD_SYSTEMIMAGE_JOURNAL_SIZE := 0
@@ -77,6 +73,7 @@ BOARD_PERSISTIMAGE_FILE_SYSTEM_TYPE := ext4
 BOARD_FLASH_BLOCK_SIZE := 131072
 
 # DTBO partition definitions
+BOARD_PREBUILT_DTBOIMAGE := device/google/wahoo-kernel/dtbo.img
 BOARD_DTBOIMG_PARTITION_SIZE := 8388608
 
 TARGET_COPY_OUT_VENDOR := vendor
@@ -177,9 +174,12 @@ TW_EXCLUDE_DEFAULT_USB_INIT := true
 TARGET_RECOVERY_FSTAB := device/google/wahoo/recovery.fstab
 #TW_RECOVERY_ADDITIONAL_RELINK_FILES := $(OUT)/system/lib64/libhardware_legacy.so
 TARGET_RECOVERY_DEVICE_MODULES += android.hardware.boot@1.0
+TARGET_RECOVERY_DEVICE_MODULES += android.hardware.confirmationui@1.0.so
 TW_RECOVERY_ADDITIONAL_RELINK_FILES := out/target/product/$(PRODUCT_HARDWARE)/system/lib64/android.hardware.boot@1.0.so
+TW_RECOVERY_ADDITIONAL_RELINK_FILES += out/target/product/$(PRODUCT_HARDWARE)/system/lib64/vndk-28/android.hardware.confirmationui@1.0.so
 #TWRP_INCLUDE_LOGCAT := true
 TARGET_USES_LOGD := true
 # MTP will not work until we update it to support ffs
 TW_EXCLUDE_MTP := true
 PLATFORM_SECURITY_PATCH := 2025-12-31
+TW_USE_TOOLBOX := true
